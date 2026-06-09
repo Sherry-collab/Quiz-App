@@ -38,6 +38,31 @@ _DUMMY_QUIZZES = [
 ]
 
 
+@router.post("/", response_model=schemas.Quiz, status_code=status.HTTP_201_CREATED)
+def create_quiz(
+    request: schemas.QuizCreate,
+    current_user: models.User = Depends(get_current_user),
+):
+    """Create a quiz. Only users with the **teacher** role are allowed."""
+    if current_user.role != "teacher":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only teachers can create quizzes",
+        )
+
+    new_id = max((q["id"] for q in _DUMMY_QUIZZES), default=0) + 1
+    quiz = {
+        "id": new_id,
+        "title": request.title,
+        "questions": [
+            {"id": i + 1, "text": q.text, "options": q.options}
+            for i, q in enumerate(request.questions)
+        ],
+    }
+    _DUMMY_QUIZZES.append(quiz)
+    return quiz
+
+
 @router.get("/", response_model=list[schemas.Quiz])
 def list_quizzes(current_user: models.User = Depends(get_current_user)):
     """List all quizzes. Requires a valid bearer token."""

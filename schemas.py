@@ -46,3 +46,13 @@ class Quiz(BaseModel):
     id: int
     title: str
     questions: List[Question]
+
+
+class QuestionCreate(BaseModel):
+    text: str
+    options: List[str]
+
+
+class QuizCreate(BaseModel):
+    title: str
+    questions: List[QuestionCreate]
