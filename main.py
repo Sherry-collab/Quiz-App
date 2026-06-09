@@ -1,28 +1,41 @@
-from fastapi import FastAPI, Depends, HTTPException
-import models, schemas, database
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
 
-app = FastAPI()
+import database
+import models
+from routers import authetication, quiz
 
-get_db = database.get_db
+# Create tables on startup (no-op if they already exist).
+models.Base.metadata.create_all(bind=database.engine)
 
-@app.post("/login")
-def login(request: schemas.Login, db: Session = Depends(get_db)):
+tags_metadata = [
+    {
+        "name": "Authentication",
+        "description": "Register a user and obtain a JWT access token.",
+    },
+    {
+        "name": "Quizzes",
+        "description": "Quiz endpoints. **Protected** — require a valid bearer token.",
+    },
+]
 
-    user = db.query(models.User).filter(
-        models.User.email == request.email
-    ).first()
+app = FastAPI(
+    title="Quiz App API",
+    description=(
+        "A simple quiz API with JWT authentication.\n\n"
+        "**How to authorize in Swagger:**\n"
+        "1. `POST /register` to create a user.\n"
+        "2. Click the **Authorize** button (top right) and log in with that "
+        "user's email (as username) and password.\n"
+        "3. Call the protected `/quizzes` endpoints."
+    ),
+    version="1.0.0",
+    openapi_tags=tags_metadata,
+)
 
-    if not user:
-        raise HTTPException(status_code=404,
-                            detail="User not found")
+app.include_router(authetication.router)
+app.include_router(quiz.router)
 
-    if user.password != request.password: 
-        raise HTTPException(status_code=401,
-                            detail="Invalid password")
 
-    return {
-        "message": "Login successful",
-        "role": user.role
-    }
-
+@app.get("/", tags=["Health"])
+def root():
+    return {"status": "ok", "docs": "/docs"}
