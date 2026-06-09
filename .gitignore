@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+.venv/
+fastapi-env/
+
+# Environment Variables
+.env
+.env.*
+
+# IDEs
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite3
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Type Checking
+.mypy_cache/
+
+# Build Files
+build/
+dist/
+*.egg-info/
+
+# FastAPI / Uvicorn
+uvicorn.log
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Uploads
+uploads/
+
+# Cache
+.cache/
+
+# PyInstaller
+*.spec
